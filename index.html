@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #map {
+            position: absolute;
+            height: 500px;
+            padding-left: 5%;
+            width: 75%;
+        }
+        #display{
+            position: absolute;
+            margin-top:57%;
+        }
+
+    </style>
+</head>
+<body bgcolor="#5f9ea0">
+<h3>My browser application</h3>
+<div id = "content">
+    <div id="map"></div>
+    <div id="display"></div>
+</div>
+<script>
+    let contentInfo = "";
+    let newRequest = new XMLHttpRequest();
+    let marker;
+    let ourWeather = {
+        base:"",
+        clouds:{
+            all:""
+        },
+        cod:"",
+        coord:{
+            lon:"" ,
+            lat:""
+        },
+        dt:"",
+        id:"",
+        main:{
+            temp: "" ,
+            pressure: "" ,
+            humidity: "",
+            temp_min: "",
+            temp_max: ""
+        },
+        name: "",
+        sys:{
+            message: "" ,
+            country: "" ,
+            sunrise: "",
+            sunset:""
+        },
+        weather:[{
+            id:"",
+            main:"",
+            description:"",
+            icon:""
+        }],
+        wind:{
+            speed:"" ,
+            deg:""
+        }
+    };
+    let Lat = 49.2331;
+    let Lng = 28.4682;
+
+    let openWeater = "http://api.openweathermap.org/data/2.5/weather?lat="+Lat+"&lon="+Lng+"&units=metric&lang=ua&APPID=dcb905108fb067f267c447aaa1fe6497";
+    getWeather(openWeater);
+    function initMap() {
+        let vinnitsya = {lat: Lat, lng: Lng};
+
+        let map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 8,
+            center: vinnitsya
+        });
+
+        function placeMarker(location) {
+            if (marker == null)
+            {
+                marker = new google.maps.Marker({
+                    position: vinnitsya,
+                    map: map
+
+                });
+            }else {
+                marker.setPosition(location);
+            }
+        }
+        getWeather(openWeater);
+        placeMarker();
+        map.addListener('click', function(e) {
+            placeMarker(e.latLng, map);
+            Lat = e.latLng.lat();
+            Lng = e.latLng.lng();
+            var openWeater = "http://api.openweathermap.org/data/2.5/weather?lat="+Lat+"&lon="+Lng+"&units=metric&lang=ru&APPID=4aa7c0b5ab95d5c353e08771e926bb64";
+            getWeather(openWeater);
+        });
+    }
+
+    function getWeather(openWeater){
+        newRequest.open("GET",openWeater);
+
+        newRequest.onload = () => {
+            ourWeather = JSON.parse(newRequest.responseText);
+            showWeather();
+            console.log(ourWeather);
+        }
+        newRequest.onerror = err => console.error('Ошибка');
+        newRequest.send();
+    }
+    function showWeather(){
+        contentInfo = "Вибране місто : "+ourWeather.name + "<br>"+ "Погода зараз : "+ourWeather.weather[0].description + "<br>" + "Температура : " + ((ourWeather.main.temp).toFixed(2)) + "<br>" + "Мінімальна температура : " + ((ourWeather.main.temp_min).toFixed(2)) + "<br>" + "Максимальна температура : " + ((ourWeather.main.temp_max).toFixed(2));
+        document.getElementById('display').innerHTML=contentInfo + "<br>" +'<image src="http://openweathermap.org/img/w/'+ourWeather.weather[0].icon+'.png">' ;
+    }
+
+</script>
+<script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBIwzALxUPNbatRBj3Xi1Uhp0fFzwWNBkE&callback=initMap">
+</script>
+</body>
+</html>
+© 2021 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
